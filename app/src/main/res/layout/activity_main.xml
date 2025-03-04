@@ -6,27 +6,55 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/logo"
+        android:layout_gravity="center"
+        android:contentDescription="@string/app_logo"
+        android:layout_marginTop="150dp"
+        android:layout_marginBottom="16dp"
+        />
+
     <TextView
-        android:id="@+id/Ltext"
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
+        android:text="@string/app_name"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginBottom="50dp"
         />
 
 
-    <!--    Худший вариант-->
-    <!--    <Button-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:onClick="myMethod"-->
-    <!--        android:text="@string/button1" />-->
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"
+        android:text="@string/start"
         android:id="@+id/button1"
-        android:layout_marginTop="56dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
         />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/leaderboard"
+        android:id="@+id/button2"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/options"
+        android:id="@+id/button3"
+        android:layout_gravity="center"
+        />
 </LinearLayout>
