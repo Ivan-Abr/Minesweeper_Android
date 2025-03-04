@@ -13,8 +13,6 @@
         android:layout_width="350dp"
         android:layout_height="350dp"
         android:padding="5dp"
-        android:columnCount="5"
-        android:rowCount="5"
         android:textAlignment="center"
         android:alignmentMode="alignMargins"
         android:useDefaultMargins="true"
