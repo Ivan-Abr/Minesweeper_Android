@@ -1,5 +1,7 @@
 package com.example.minesweeper
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
@@ -10,13 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 
 class FieldActivity : AppCompatActivity() {
 
-    private val n = 6
+    private var n = 6
+    private var m = 10
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_field)
-
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
+
+        val sharedPref: SharedPreferences = getSharedPreferences("Data", Context.MODE_PRIVATE)
+        n = sharedPref.getInt("field_size", 5)
+        m = sharedPref.getInt("mine_count", 5)
         gridLayout.columnCount = n
         gridLayout.rowCount = n
 

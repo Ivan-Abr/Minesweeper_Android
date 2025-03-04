@@ -1,7 +1,12 @@
 <resources>
     <string name="app_name">Minesweeper</string>
-    <string name="start">Start</string>
-    <string name="options">Options</string>
-    <string name="leaderboard">Leaderboard</string>
-    <string name="app_logo">App Logo</string>
+    <string name="start">Играть</string>
+    <string name="options">Настройки</string>
+    <string name="leaderboard">Доска лидеров</string>
+    <string name="app_logo">Блоб пердун</string>
+
+    <string name="settings"> Настройки </string>
+    <string name="mines_hint"> Количество мин (например, 10)</string>
+    <string name="field_hint">Размер поля (до 10)</string>
+    <string name="save_options">Сохранить</string>
 </resources>
