@@ -50,7 +50,7 @@ class FieldActivity : AppCompatActivity() {
                 textSize = (24 - n).coerceAtLeast(4).toFloat()
                 setTypeface(null, Typeface.BOLD)
                 setOnClickListener {
-                    text = if (field[i][j] == 1) "*" else "#"
+                    text = field[i][j].toString()
                 }
             }
 
@@ -73,13 +73,25 @@ class FieldActivity : AppCompatActivity() {
 
     private fun generateField(n: Int, m: Int):Array<Array<Int>>{
         val field =  Array(n) { Array(n) { 0 }}
-        var count = m
-        while (count!=0){
-            val i = Random.nextInt(0,n)
-            val j = Random.nextInt(0,n)
-            if (field[i][j] != 1){
-                field[i][j] = 1
-                count-=1
+        //var count = m
+        (0 until n * n).shuffled().take(m).forEach { index ->
+            val i = index / n
+            val j = index % n
+            field[i][j] = -1
+        }
+
+        val offsets = listOf(-1, 0, 1)
+        for (i in 0 until n) {
+            for (j in 0 until n) {
+                if (field[i][j] != -1) {
+                    field[i][j] = offsets.flatMap { di ->
+                        offsets.map { dj ->
+                            val ni = i + di
+                            val nj = j + dj
+                            if (ni in 0 until n && nj in 0 until n && field[ni][nj] == -1) 1 else 0
+                        }
+                    }.sum()
+                }
             }
         }
         return field
