@@ -27,7 +27,8 @@ class MinesweeperGame(
         8 to Color.BLACK
     )
 
-    private val field: Array<Array<Int>> = generateField(n, m)
+    private var field: Array<Array<Int>>? = null
+
     private val cells: Array<Array<TextView>> = Array(n) { i -> Array(n) { j -> createCell(i, j) } }
     var gameOver: Boolean = false
         private set
@@ -36,9 +37,15 @@ class MinesweeperGame(
         setupGrid()
     }
 
-    private fun generateField(n: Int, m: Int): Array<Array<Int>> {
+    private fun generateField(excludeI: Int, excludeJ: Int): Array<Array<Int>> {
         val field = Array(n) { Array(n) { 0 } }
-        (0 until n * n).shuffled().take(m).forEach { index ->
+        val totalCells = n * n
+        val indices = (0 until totalCells).filter { index ->
+            val i = index / n
+            val j = index % n
+            !(i == excludeI && j == excludeJ)
+        }
+        indices.shuffled().take(m).forEach { index ->
             val i = index / n
             val j = index % n
             field[i][j] = -1
@@ -91,8 +98,12 @@ class MinesweeperGame(
     }
 
     private fun onCellClicked(i: Int, j: Int) {
-        if (gameOver || cells[i][j].isClickable.not()) return
-        when (field[i][j]) {
+        if (field == null) {
+            field = generateField(i, j)
+        }
+        if (gameOver || !cells[i][j].isClickable) return
+
+        when (field!![i][j]) {
             -1 -> {
                 revealAllMines()
                 gameOver = true
@@ -103,12 +114,11 @@ class MinesweeperGame(
     }
 
     private fun revealCell(i: Int, j: Int) {
-        if (cells[i][j].isClickable.not()) return
+        if (!cells[i][j].isClickable) return
         cells[i][j].apply {
-            text = if (field[i][j] > 0) field[i][j].toString() else ""
-            val value = field[i][j]
+            val value = field!![i][j]
+            text = if (value > 0) value.toString() else ""
             if (value > 0) {
-                text = value.toString()
                 setTextColor(numberColors[value] ?: Color.BLACK)
             }
             textSize = (cellSize * 0.4f).coerceAtLeast(10f)
@@ -118,9 +128,9 @@ class MinesweeperGame(
     }
 
     private fun revealZeroCells(i: Int, j: Int) {
-        if (i !in 0 until n || j !in 0 until n || cells[i][j].isClickable.not()) return
+        if (i !in 0 until n || j !in 0 until n || !cells[i][j].isClickable) return
         revealCell(i, j)
-        if (field[i][j] == 0) {
+        if (field!![i][j] == 0) {
             for (di in -1..1) {
                 for (dj in -1..1) {
                     if (di != 0 || dj != 0) {
@@ -134,19 +144,18 @@ class MinesweeperGame(
     private fun revealAllMines() {
         for (i in 0 until n) {
             for (j in 0 until n) {
-                if (field[i][j] == -1) {
+                if (field!![i][j] == -1) {
                     cells[i][j].apply {
                         text = ""
                         isSelected = true
                         isClickable = false
 
                         val mineDrawable = ContextCompat.getDrawable(context, R.drawable.mine_icon)?.apply {
-                            setBounds(0, 0, cellSize * 2, cellSize * 2) // Размер 50% от клетки
+                            setBounds(0, 0, cellSize * 2, cellSize * 2)
                         }
                         setCompoundDrawables(null, null, null, mineDrawable)
-                        compoundDrawablePadding = cellSize / 2 // Отступ, чтобы иконка не прилипала к краям
-                        gravity = Gravity.CENTER // Центрирование
-
+                        compoundDrawablePadding = cellSize / 2
+                        gravity = Gravity.CENTER
                     }
                 } else {
                     cells[i][j].isClickable = false
@@ -157,3 +166,4 @@ class MinesweeperGame(
 
     private fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 }
+
