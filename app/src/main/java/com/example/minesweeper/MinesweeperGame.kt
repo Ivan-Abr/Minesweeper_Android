@@ -33,6 +33,8 @@ class MinesweeperGame(
     var gameOver: Boolean = false
         private set
 
+    var gameEndListener: ((isVictory: Boolean) -> Unit)? = null
+
     init {
         setupGrid()
     }
@@ -40,6 +42,7 @@ class MinesweeperGame(
     private fun generateField(excludeI: Int, excludeJ: Int): Array<Array<Int>> {
         val field = Array(n) { Array(n) { 0 } }
         val totalCells = n * n
+        // Исключаем ячейку, по которой кликнули
         val indices = (0 until totalCells).filter { index ->
             val i = index / n
             val j = index % n
@@ -82,6 +85,7 @@ class MinesweeperGame(
     private fun setupGrid() {
         gridLayout.rowCount = n
         gridLayout.columnCount = n
+        gridLayout.removeAllViews()
         for (i in 0 until n) {
             for (j in 0 until n) {
                 val params = GridLayout.LayoutParams().apply {
@@ -107,9 +111,17 @@ class MinesweeperGame(
             -1 -> {
                 revealAllMines()
                 gameOver = true
+                // Уведомляем активность о поражении
+                gameEndListener?.invoke(false)
             }
-            0 -> revealZeroCells(i, j)
-            else -> revealCell(i, j)
+            0 -> {
+                revealZeroCells(i, j)
+                checkVictory()
+            }
+            else -> {
+                revealCell(i, j)
+                checkVictory()
+            }
         }
     }
 
@@ -149,7 +161,6 @@ class MinesweeperGame(
                         text = ""
                         isSelected = true
                         isClickable = false
-
                         val mineDrawable = ContextCompat.getDrawable(context, R.drawable.mine_icon)?.apply {
                             setBounds(0, 0, cellSize * 2, cellSize * 2)
                         }
@@ -164,6 +175,21 @@ class MinesweeperGame(
         }
     }
 
+    private fun checkVictory() {
+        if (gameOver) return
+        var revealedCount = 0
+        for (i in 0 until n) {
+            for (j in 0 until n) {
+                if (!cells[i][j].isClickable && field!![i][j] != -1) {
+                    revealedCount++
+                }
+            }
+        }
+        if (revealedCount == n * n - m) {
+            gameOver = true
+            gameEndListener?.invoke(true)
+        }
+    }
+
     private fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 }
-

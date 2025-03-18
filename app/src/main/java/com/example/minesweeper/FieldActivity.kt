@@ -5,9 +5,12 @@ import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.GridLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlin.random.Random
 
@@ -15,6 +18,8 @@ class FieldActivity : AppCompatActivity() {
 
     private var n = 6
     private var m = 10
+    private lateinit var game: MinesweeperGame
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -27,8 +32,6 @@ class FieldActivity : AppCompatActivity() {
         gridLayout.columnCount = n
         gridLayout.rowCount = n
 
-
-
         val dynamicPadding = (16 - (n / 2)).coerceAtLeast(4)
         gridLayout.setPadding(
             dynamicPadding.dpToPx(),
@@ -40,7 +43,35 @@ class FieldActivity : AppCompatActivity() {
         val totalSize = 350 - 2 * dynamicPadding
         val cellSize = totalSize / n
 
-        val game = MinesweeperGame(this, gridLayout, n, m, cellSize)
+        game = MinesweeperGame(this, gridLayout, n, m, cellSize)
+        game.gameEndListener = { isVictory ->
+            runOnUiThread { showGameEndDialog(isVictory) }
+        }
+    }
+
+    private fun showGameEndDialog(isVictory: Boolean) {
+        val message = if (isVictory) "ПОБЕДА" else "ПОРАЖЕНИЕ"
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_end_game, null)
+        dialogView.findViewById<TextView>(R.id.tvMessage).text = message
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.btnRestart).setOnClickListener {
+            dialog.dismiss()
+            restartGame()
+        }
+        dialogView.findViewById<Button>(R.id.btnExit).setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+        dialog.show()
+    }
+
+    private fun restartGame() {
+        recreate()
     }
 
     private fun Int.dpToPx(): Int {
