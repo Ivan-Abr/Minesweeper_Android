@@ -22,9 +22,13 @@ class FieldActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContentView(R.layout.activity_field)
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
+
+        val buttonRestart: Button= findViewById(R.id.btnRestart)
+        val buttonExit: Button = findViewById(R.id.btnExit)
+        val gameText: TextView = findViewById(R.id.gameText)
 
         val sharedPref: SharedPreferences = getSharedPreferences("Data", Context.MODE_PRIVATE)
         n = sharedPref.getInt("field_size", 5)
@@ -47,31 +51,39 @@ class FieldActivity : AppCompatActivity() {
         game.gameEndListener = { isVictory ->
             runOnUiThread { showGameEndDialog(isVictory) }
         }
+
+        buttonRestart.setOnClickListener{
+            gameText.text = ""
+            game = MinesweeperGame(this, gridLayout, n, m, cellSize)
+        }
+
+        buttonExit.setOnClickListener{
+            finish()
+        }
     }
 
     private fun showGameEndDialog(isVictory: Boolean) {
         val message = if (isVictory) "ПОБЕДА" else "ПОРАЖЕНИЕ"
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_end_game, null)
-        dialogView.findViewById<TextView>(R.id.tvMessage).text = message
+        val gameText: TextView = findViewById(R.id.gameText)
+        gameText.text = message
 
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setCancelable(false)
-            .create()
-
-        dialogView.findViewById<Button>(R.id.btnRestart).setOnClickListener {
-            dialog.dismiss()
-            restartGame()
-        }
-        dialogView.findViewById<Button>(R.id.btnExit).setOnClickListener {
-            dialog.dismiss()
-            finish()
-        }
-        dialog.show()
-    }
-
-    private fun restartGame() {
-        recreate()
+//        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_end_game, null)
+//        dialogView.findViewById<TextView>(R.id.tvMessage).text = message
+//
+//        val dialog = AlertDialog.Builder(this)
+//            .setView(dialogView)
+//            .setCancelable(false)
+//            .create()
+//
+//        dialogView.findViewById<Button>(R.id.btnRestart).setOnClickListener {
+//            dialog.dismiss()
+//            restartGame()
+//        }
+//        dialogView.findViewById<Button>(R.id.btnExit).setOnClickListener {
+//            dialog.dismiss()
+//            finish()
+//        }
+//        dialog.show()
     }
 
     private fun Int.dpToPx(): Int {
