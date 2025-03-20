@@ -1,6 +1,7 @@
 package com.example.minesweeper
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Typeface
@@ -10,11 +11,18 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.Chronometer
+import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.minesweeper.DBHelper.Companion.COLUMN_FIELD_SIZE
+import com.example.minesweeper.DBHelper.Companion.COLUMN_MINE_COUNT
+import com.example.minesweeper.DBHelper.Companion.COLUMN_NAME
+import com.example.minesweeper.DBHelper.Companion.COLUMN_TIME
+import com.example.minesweeper.DBHelper.Companion.TABLE_NAME
 import kotlin.random.Random
 
 class FieldActivity : AppCompatActivity() {
@@ -98,12 +106,23 @@ class FieldActivity : AppCompatActivity() {
         val resultInfo = "Размер поля: $n\nМин: $m\n Время: $time"
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_save_result, null)
         val tvResultInfo = dialogView.findViewById<TextView>(R.id.tvResultInfo)
+        val etName = dialogView.findViewById<EditText>(R.id.etName)
         tvResultInfo.text = resultInfo
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setCancelable(false)
             .create()
+
+        dialogView.findViewById<Button>(R.id.btnSave).setOnClickListener {
+            val name = etName.text.toString().trim()
+            if (name.isNotEmpty()) {
+                saveResult(this, name, n, m, time)
+                Toast.makeText(this, "Результат сохранён", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            } else
+                Toast.makeText(this, "Введите имя", Toast.LENGTH_SHORT).show()
+        }
 
         dialogView.findViewById<Button>(R.id.btnCancel).setOnClickListener {
             dialog.dismiss()
@@ -115,5 +134,18 @@ class FieldActivity : AppCompatActivity() {
 
     private fun Int.dpToPx(): Int {
         return (this * resources.displayMetrics.density).toInt()
+    }
+
+    private fun saveResult(context: Context, name: String, fieldSize: Int, mineCount: Int, time: String) {
+        val dbHelper = DBHelper(context)
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_NAME, name)
+            put(COLUMN_FIELD_SIZE, fieldSize)
+            put(COLUMN_MINE_COUNT, mineCount)
+            put(COLUMN_TIME, time)
+        }
+        db.insert(TABLE_NAME, null, values)
+        db.close()
     }
 }
