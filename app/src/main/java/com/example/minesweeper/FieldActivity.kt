@@ -66,24 +66,6 @@ class FieldActivity : AppCompatActivity() {
         val message = if (isVictory) "ПОБЕДА" else "ПОРАЖЕНИЕ"
         val gameText: TextView = findViewById(R.id.gameText)
         gameText.text = message
-
-//        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_end_game, null)
-//        dialogView.findViewById<TextView>(R.id.tvMessage).text = message
-//
-//        val dialog = AlertDialog.Builder(this)
-//            .setView(dialogView)
-//            .setCancelable(false)
-//            .create()
-//
-//        dialogView.findViewById<Button>(R.id.btnRestart).setOnClickListener {
-//            dialog.dismiss()
-//            restartGame()
-//        }
-//        dialogView.findViewById<Button>(R.id.btnExit).setOnClickListener {
-//            dialog.dismiss()
-//            finish()
-//        }
-//        dialog.show()
     }
 
     private fun Int.dpToPx(): Int {

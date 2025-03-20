@@ -9,4 +9,6 @@
     <string name="mines_hint"> Количество мин (например, 10)</string>
     <string name="field_hint">Размер поля (до 10)</string>
     <string name="save_options">Сохранить</string>
+    <string name="button_restart">Заново</string>
+    <string name="button_exit">Выйти в меню</string>
 </resources>

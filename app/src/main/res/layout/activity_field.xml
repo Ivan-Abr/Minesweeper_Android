@@ -13,9 +13,11 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textAppearance="?attr/textAppearanceTitleLarge"
+        android:fontFamily="sans-serif-black"
         android:text=""
         android:id="@+id/gameText"
-        android:layout_weight="0"/>
+        android:layout_weight="0"
+        android:paddingTop="100dp"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -50,14 +52,14 @@
             android:id="@+id/btnRestart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Заново" />
+            android:text="@string/button_restart" />
 
         <Button
             android:id="@+id/btnExit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Выйти в меню" />
+            android:text="@string/button_exit" />
     </LinearLayout>
 
 </LinearLayout>
