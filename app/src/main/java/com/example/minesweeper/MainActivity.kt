@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val button1: Button = findViewById(R.id.button1)
+        val button2: Button = findViewById(R.id.button2)
         val button3: Button = findViewById(R.id.button3)
 
 
@@ -20,18 +21,27 @@ class MainActivity : AppCompatActivity() {
             getToFieldActivity()
         }
 
+        button2.setOnClickListener {
+            getToRecordsActivity()
+        }
+
         button3.setOnClickListener {
             getToOptionsActivity()
         }
     }
 
-    private fun getToFieldActivity(){
+    private fun getToFieldActivity() {
         val intent = Intent(this, FieldActivity::class.java)
         startActivity(intent)
     }
 
-    private fun getToOptionsActivity(){
+    private fun getToOptionsActivity() {
         val intent = Intent(this, OptionsActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun getToRecordsActivity() {
+        val intent = Intent(this, RecordsActivity::class.java)
         startActivity(intent)
     }
 }

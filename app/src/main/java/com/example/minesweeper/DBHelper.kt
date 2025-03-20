@@ -35,16 +35,32 @@ class DBHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null,
         onCreate(db)
     }
 
-    fun saveResult(context: Context, name: String, fieldSize: Int, mineCount: Int, time: String) {
-        val dbHelper = DBHelper(context)
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_NAME, name)
-            put(COLUMN_FIELD_SIZE, fieldSize)
-            put(COLUMN_MINE_COUNT, mineCount)
-            put(COLUMN_TIME, time)
+
+    fun getAllRecords(): List<Record> {
+        val records = mutableListOf<Record>()
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_NAME,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "$COLUMN_ID DESC"
+        )
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME))
+                val fieldSize = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FIELD_SIZE))
+                val mineCount = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MINE_COUNT))
+                val time = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TIME))
+                records.add(Record(id, name, fieldSize, mineCount, time))
+            } while (cursor.moveToNext())
         }
-        db.insert(TABLE_NAME, null, values)
+        cursor.close()
         db.close()
+        return records
     }
+
 }
