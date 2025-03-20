@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.Chronometer
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -22,13 +24,12 @@ class FieldActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
         setContentView(R.layout.activity_field)
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
-
-        val buttonRestart: Button= findViewById(R.id.btnRestart)
+        val buttonRestart: Button = findViewById(R.id.btnRestart)
         val buttonExit: Button = findViewById(R.id.btnExit)
         val gameText: TextView = findViewById(R.id.gameText)
+        val chronometer: Chronometer = findViewById(R.id.chronometer)
 
         val sharedPref: SharedPreferences = getSharedPreferences("Data", Context.MODE_PRIVATE)
         n = sharedPref.getInt("field_size", 5)
@@ -47,14 +48,29 @@ class FieldActivity : AppCompatActivity() {
         val totalSize = 350 - 2 * dynamicPadding
         val cellSize = totalSize / n
 
+        chronometer.base = SystemClock.elapsedRealtime()
+        chronometer.start()
+
         game = MinesweeperGame(this, gridLayout, n, m, cellSize)
+        gameText.text = m.toString()
+        game.onFlagCountChanged = { count ->
+            runOnUiThread { gameText.text = count.toString() }
+        }
         game.gameEndListener = { isVictory ->
-            runOnUiThread { showGameEndDialog(isVictory) }
+            runOnUiThread {
+                chronometer.stop()
+                showGameEndDialog(isVictory) }
         }
 
         buttonRestart.setOnClickListener{
-            gameText.text = ""
+            gameText.text = m.toString()
             game = MinesweeperGame(this, gridLayout, n, m, cellSize)
+            game.onFlagCountChanged = { count ->
+                runOnUiThread { gameText.text = count.toString() }
+            }
+            game.gameEndListener = { isVictory ->
+                runOnUiThread { showGameEndDialog(isVictory) }
+            }
         }
 
         buttonExit.setOnClickListener{

@@ -29,7 +29,17 @@ class MinesweeperGame(
 
     private var field: Array<Array<Int>>? = null
 
-    private val cells: Array<Array<TextView>> = Array(n) { i -> Array(n) { j -> createCell(i, j) } }
+    private val flags: Array<Array<Boolean>> = Array(n) { Array(n) { false } }
+
+    private var flagCount: Int = m
+
+    var onFlagCountChanged: ((Int) -> Unit)? = null
+
+    private val cells: Array<Array<TextView>> = Array(n) { i ->
+        Array(n) { j ->
+            createCell(i, j)
+        }
+    }
     var gameOver: Boolean = false
         private set
 
@@ -42,7 +52,6 @@ class MinesweeperGame(
     private fun generateField(excludeI: Int, excludeJ: Int): Array<Array<Int>> {
         val field = Array(n) { Array(n) { 0 } }
         val totalCells = n * n
-        // Исключаем ячейку, по которой кликнули
         val indices = (0 until totalCells).filter { index ->
             val i = index / n
             val j = index % n
@@ -79,6 +88,10 @@ class MinesweeperGame(
             setTypeface(null, Typeface.BOLD)
             setBackgroundResource(R.drawable.cell_background)
             setOnClickListener { onCellClicked(i, j) }
+            setOnLongClickListener {
+                toggleFlag(i, j)
+                true
+            }
         }
     }
 
@@ -102,6 +115,9 @@ class MinesweeperGame(
     }
 
     private fun onCellClicked(i: Int, j: Int) {
+        if (gameOver || !cells[i][j].isClickable) return
+        if (flags[i][j]) return
+
         if (field == null) {
             field = generateField(i, j)
         }
@@ -111,7 +127,6 @@ class MinesweeperGame(
             -1 -> {
                 revealAllMines()
                 gameOver = true
-                // Уведомляем активность о поражении
                 gameEndListener?.invoke(false)
             }
             0 -> {
@@ -123,6 +138,28 @@ class MinesweeperGame(
                 checkVictory()
             }
         }
+    }
+
+    private fun toggleFlag(i: Int, j: Int) {
+        if (gameOver) return
+        if (field == null) {
+            field = generateField(i, j)
+        }
+        if (!cells[i][j].isClickable && !flags[i][j]) return
+
+        if (flags[i][j]) {
+            flags[i][j] = false
+            cells[i][j].text = ""
+            cells[i][j].isClickable = true
+            flagCount++
+        } else {
+            flags[i][j] = true
+            cells[i][j].text = "F"
+            cells[i][j].isClickable = false
+            flagCount--
+        }
+        onFlagCountChanged?.invoke(flagCount)
+        checkVictoryWithFlags()
     }
 
     private fun revealCell(i: Int, j: Int) {
@@ -186,6 +223,25 @@ class MinesweeperGame(
             }
         }
         if (revealedCount == n * n - m) {
+            gameOver = true
+            gameEndListener?.invoke(true)
+        }
+    }
+
+    private fun checkVictoryWithFlags() {
+        if (field == null) return
+        var victory = true
+        for (i in 0 until n) {
+            for (j in 0 until n) {
+                if (field!![i][j] == -1 && !flags[i][j]) {
+                    victory = false
+                }
+                if (flags[i][j] && field!![i][j] != -1) {
+                    victory = false
+                }
+            }
+        }
+        if (victory) {
             gameOver = true
             gameEndListener?.invoke(true)
         }
