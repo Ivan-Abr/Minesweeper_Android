@@ -149,12 +149,15 @@ class MinesweeperGame(
 
         if (flags[i][j]) {
             flags[i][j] = false
-            cells[i][j].text = ""
+            cells[i][j].setCompoundDrawables(null, null, null, null)
             cells[i][j].isClickable = true
             flagCount++
         } else {
             flags[i][j] = true
-            cells[i][j].text = "F"
+            val flagDrawable = ContextCompat.getDrawable(context, R.drawable.flag_icon)?.apply {
+                setBounds(0, 0, cellSize * 2, cellSize * 2)
+            }
+            cells[i][j].setCompoundDrawables(null, null, null, flagDrawable)
             cells[i][j].isClickable = false
             flagCount--
         }
