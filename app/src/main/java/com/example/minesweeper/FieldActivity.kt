@@ -1,5 +1,6 @@
 package com.example.minesweeper
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Typeface
@@ -58,8 +59,11 @@ class FieldActivity : AppCompatActivity() {
         }
         game.gameEndListener = { isVictory ->
             runOnUiThread {
+                val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
+                showSaveResultDialog(elapsedTime)
+                showGameEndDialog(isVictory)
                 chronometer.stop()
-                showGameEndDialog(isVictory) }
+            }
         }
 
         buttonRestart.setOnClickListener{
@@ -83,6 +87,31 @@ class FieldActivity : AppCompatActivity() {
         val gameText: TextView = findViewById(R.id.gameText)
         gameText.text = message
     }
+
+    @SuppressLint("InflateParams", "DefaultLocale")
+    private fun showSaveResultDialog(elapsedTimeMillis: Long) {
+
+        val seconds = (elapsedTimeMillis / 1000) % 60
+        val minutes = (elapsedTimeMillis / (1000 * 60)) % 60
+        val time = String.format("%02d:%02d", minutes, seconds)
+
+        val resultInfo = "Размер поля: $n\nМин: $m\n Время: $time"
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_save_result, null)
+        val tvResultInfo = dialogView.findViewById<TextView>(R.id.tvResultInfo)
+        tvResultInfo.text = resultInfo
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.btnCancel).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
 
     private fun Int.dpToPx(): Int {
         return (this * resources.displayMetrics.density).toInt()
